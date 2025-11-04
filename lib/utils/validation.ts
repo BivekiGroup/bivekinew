@@ -25,7 +25,7 @@ export const nameSchema = z
 
 // Валидация роли
 export const roleSchema = z.nativeEnum(UserRole, {
-  errorMap: () => ({ message: 'Некорректная роль пользователя' }),
+  message: 'Некорректная роль пользователя',
 });
 
 // Валидация для создания пользователя
@@ -54,7 +54,7 @@ export function validateOrThrow<T>(schema: z.ZodSchema<T>, data: unknown): T {
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((err) => err.message).join(', ');
+      const errorMessages = error.issues.map((err) => err.message).join(', ');
       throw new Error(`Ошибка валидации: ${errorMessages}`);
     }
     throw error;

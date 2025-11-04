@@ -1,6 +1,7 @@
 'use client';
 
 import { ProtectedRoute } from '../../components/auth/ProtectedRoute';
+import { UserRole } from '../../providers/AuthProvider';
 import { useQuery, gql } from '@apollo/client';
 import { useParams } from 'next/navigation';
 import { AppLayout } from '../../components/layout/AppLayout';
@@ -323,7 +324,7 @@ function ProjectDetailContent() {
 
 export default function ProjectDetailPage() {
   return (
-    <ProtectedRoute allowedRoles={['CUSTOMER']}>
+    <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
       <AppLayout>
         <ProjectDetailContent />
       </AppLayout>

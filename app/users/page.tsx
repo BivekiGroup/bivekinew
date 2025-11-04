@@ -266,7 +266,7 @@ function UsersContent() {
           setShowViewModal(false);
           setSelectedUser(null);
         }}
-        user={selectedUser}
+        user={selectedUser as any}
         onUpdate={() => {
           refetchUsers();
         }}
@@ -277,7 +277,7 @@ function UsersContent() {
 
 export default function UsersPage() {
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
       <AppLayout>
         <UsersContent />
       </AppLayout>

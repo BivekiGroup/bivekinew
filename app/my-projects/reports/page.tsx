@@ -1,6 +1,7 @@
 'use client';
 
 import { ProtectedRoute } from '../../components/auth/ProtectedRoute';
+import { UserRole } from '../../providers/AuthProvider';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { useState } from 'react';
 import { AppLayout } from '../../components/layout/AppLayout';
@@ -364,7 +365,7 @@ function ReportsContent() {
 
 export default function ReportsPage() {
   return (
-    <ProtectedRoute allowedRoles={['CUSTOMER']}>
+    <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
       <AppLayout>
         <ReportsContent />
       </AppLayout>

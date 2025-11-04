@@ -7,12 +7,14 @@ import { useEffect } from 'react';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: UserRole;
+  allowedRoles?: UserRole[];
   requireAuth?: boolean;
 }
 
 export function ProtectedRoute({
   children,
   requiredRole,
+  allowedRoles,
   requireAuth = true
 }: ProtectedRouteProps) {
   const { user, loading, isAuthenticated } = useAuth();
@@ -26,12 +28,18 @@ export function ProtectedRoute({
         return;
       }
 
-      // Проверка роли
+      // Проверка роли (одна конкретная роль)
       if (requiredRole && user?.role !== requiredRole) {
-        router.push('/dashboard'); // Редирект на дашборд если роль не подходит
+        router.push('/dashboard');
+        return;
+      }
+
+      // Проверка роли (список разрешенных ролей)
+      if (allowedRoles && allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
+        router.push('/dashboard');
       }
     }
-  }, [loading, isAuthenticated, user, requiredRole, requireAuth, router]);
+  }, [loading, isAuthenticated, user, requiredRole, allowedRoles, requireAuth, router]);
 
   // Показываем загрузку пока проверяем авторизацию
   if (loading) {
@@ -50,8 +58,13 @@ export function ProtectedRoute({
     return null;
   }
 
-  // Если роль не подходит
+  // Если роль не подходит (одна конкретная роль)
   if (requiredRole && user?.role !== requiredRole) {
+    return null;
+  }
+
+  // Если роль не подходит (список разрешенных ролей)
+  if (allowedRoles && allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
     return null;
   }
 

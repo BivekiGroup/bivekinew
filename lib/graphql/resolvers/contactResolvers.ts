@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { ContactStatus } from '@prisma/client';
 import { sendContactFormNotification } from '@/lib/email/emailService';
 import type { GraphQLContext } from '../context';
 
@@ -128,7 +129,7 @@ export const contactResolvers = {
     // Обновить статус заявки (только для админов)
     updateContactFormStatus: async (
       _: unknown,
-      { id, status }: { id: string; status: string },
+      { id, status }: { id: string; status: ContactStatus },
       context: GraphQLContext
     ) => {
       if (!context.user) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
-import { useAuth } from '../providers/AuthProvider';
+import { useAuth, UserRole } from '../providers/AuthProvider';
 import { useQuery, gql } from '@apollo/client';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -233,7 +233,7 @@ function ProjectsContent() {
 
 export default function ProjectsPage() {
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'DEVELOPER']}>
+    <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.DEVELOPER]}>
       <AppLayout>
         <ProjectsContent />
       </AppLayout>
