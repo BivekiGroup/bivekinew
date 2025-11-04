@@ -12,7 +12,7 @@ COPY prisma ./prisma/
 
 # Установка зависимостей
 FROM base AS deps
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Генерация Prisma Client
 RUN npx prisma generate
