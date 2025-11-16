@@ -163,6 +163,9 @@ model Task {
   // Учет времени (в часах)
   timeSpent   Float?       @default(0)
 
+  // Дата, когда была выполнена работа
+  workDate    DateTime?
+
   // Даты
   dueDate     DateTime?
   completedAt DateTime?

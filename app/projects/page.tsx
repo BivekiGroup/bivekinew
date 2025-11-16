@@ -53,9 +53,21 @@ function ProjectsContent() {
     skip: user?.role !== 'ADMIN', // Запрашиваем только для админа
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const projects = projectsData?.projects || [];
   const customers = customersData?.users?.filter((u: any) => u.role === 'CUSTOMER') || [];
+
+  // Фильтрация проектов по поисковому запросу
+  const filteredProjects = projects.filter((project: any) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      project.name.toLowerCase().includes(query) ||
+      project.description?.toLowerCase().includes(query) ||
+      project.customer.name?.toLowerCase().includes(query) ||
+      project.customer.email?.toLowerCase().includes(query)
+    );
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -114,26 +126,54 @@ function ProjectsContent() {
           )}
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-8">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Поиск по названию, описанию, заказчику..."
+              className="w-full px-4 py-3 pl-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+            />
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500/30 border-t-purple-500"></div>
             <p className="mt-6 text-gray-400 text-lg">Загрузка проектов...</p>
           </div>
-        ) : projects.length === 0 ? (
+        ) : filteredProjects.length === 0 ? (
           <div className="text-center py-20 rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent">
             <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 mb-4">
               <svg className="w-16 h-16 text-purple-400 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <p className="text-xl font-semibold text-white mb-2">Проектов пока нет</p>
-            {user?.role === 'ADMIN' && (
+            <p className="text-xl font-semibold text-white mb-2">
+              {searchQuery ? 'Проекты не найдены' : 'Проектов пока нет'}
+            </p>
+            {!searchQuery && user?.role === 'ADMIN' && (
               <p className="text-sm text-gray-400">Нажмите "Создать проект" чтобы добавить новый проект</p>
             )}
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project: any) => (
+            {filteredProjects.map((project: any) => (
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}

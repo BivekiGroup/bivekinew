@@ -144,6 +144,7 @@ export const taskResolvers = {
           priority?: TaskPriority;
           assigneeId?: string;
           timeSpent?: number;
+          workDate?: string;
           dueDate?: string
         }
       },
@@ -189,6 +190,7 @@ export const taskResolvers = {
           priority: input.priority || 'MEDIUM',
           assigneeId: input.assigneeId,
           timeSpent: input.timeSpent || 0,
+          workDate: input.workDate ? new Date(input.workDate) : null,
           dueDate: input.dueDate ? new Date(input.dueDate) : null,
         },
         include: {
@@ -216,6 +218,7 @@ export const taskResolvers = {
           priority?: TaskPriority;
           assigneeId?: string;
           timeSpent?: number;
+          workDate?: string;
           dueDate?: string
         }
       },
@@ -254,6 +257,7 @@ export const taskResolvers = {
         }
       }
       if (input.timeSpent !== undefined) updateData.timeSpent = input.timeSpent;
+      if (input.workDate !== undefined) updateData.workDate = input.workDate ? new Date(input.workDate) : null;
       if (input.dueDate !== undefined) updateData.dueDate = input.dueDate ? new Date(input.dueDate) : null;
 
       // Проверяем существование исполнителя, если указан

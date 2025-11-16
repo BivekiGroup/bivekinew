@@ -18,6 +18,7 @@ const UPDATE_TASK = gql`
         email
       }
       timeSpent
+      workDate
       dueDate
       completedAt
     }
@@ -46,6 +47,8 @@ export function EditTaskModal({ isOpen, onClose, task, developers, onUpdate }: E
     priority: '',
     assigneeId: '',
     timeSpent: '',
+    timeUnit: 'hours',
+    workDate: '',
     dueDate: '',
   });
 
@@ -65,6 +68,8 @@ export function EditTaskModal({ isOpen, onClose, task, developers, onUpdate }: E
         priority: task.priority || '',
         assigneeId: task.assignee?.id || '',
         timeSpent: task.timeSpent?.toString() || '0',
+        timeUnit: 'hours',
+        workDate: formatDate(task.workDate),
         dueDate: formatDate(task.dueDate),
       });
     }
@@ -98,6 +103,13 @@ export function EditTaskModal({ isOpen, onClose, task, developers, onUpdate }: E
       return;
     }
 
+    // Конвертируем время в часы, если указаны минуты
+    let timeInHours = 0;
+    if (formData.timeSpent) {
+      const timeValue = parseFloat(formData.timeSpent);
+      timeInHours = formData.timeUnit === 'minutes' ? timeValue / 60 : timeValue;
+    }
+
     await updateTask({
       variables: {
         id: task.id,
@@ -107,7 +119,8 @@ export function EditTaskModal({ isOpen, onClose, task, developers, onUpdate }: E
           status: formData.status,
           priority: formData.priority,
           assigneeId: formData.assigneeId || null,
-          timeSpent: formData.timeSpent ? parseFloat(formData.timeSpent) : 0,
+          timeSpent: timeInHours,
+          workDate: formData.workDate || null,
           dueDate: formData.dueDate || null,
         },
       },
@@ -220,16 +233,39 @@ export function EditTaskModal({ isOpen, onClose, task, developers, onUpdate }: E
             {/* Time Spent */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Затраченное время (часы)
+                Затраченное время
+              </label>
+              <div className="flex gap-3">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={formData.timeSpent}
+                  onChange={(e) => setFormData({ ...formData, timeSpent: e.target.value })}
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  placeholder="0"
+                />
+                <select
+                  value={formData.timeUnit}
+                  onChange={(e) => setFormData({ ...formData, timeUnit: e.target.value })}
+                  className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="hours" className="bg-[#1a1f2e]">Часы</option>
+                  <option value="minutes" className="bg-[#1a1f2e]">Минуты</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Work Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Дата выполнения работы
               </label>
               <input
-                type="number"
-                step="0.5"
-                min="0"
-                value={formData.timeSpent}
-                onChange={(e) => setFormData({ ...formData, timeSpent: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="0"
+                type="date"
+                value={formData.workDate}
+                onChange={(e) => setFormData({ ...formData, workDate: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 

@@ -178,6 +178,7 @@ export const typeDefs = gql`
     assigneeId: ID
     assignee: User
     timeSpent: Float
+    workDate: String
     dueDate: String
     completedAt: String
     createdAt: String!
@@ -207,6 +208,7 @@ export const typeDefs = gql`
     priority: TaskPriority
     assigneeId: ID
     timeSpent: Float
+    workDate: String
     dueDate: String
   }
 
@@ -217,6 +219,7 @@ export const typeDefs = gql`
     priority: TaskPriority
     assigneeId: ID
     timeSpent: Float
+    workDate: String
     dueDate: String
   }
 
