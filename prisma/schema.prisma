@@ -61,6 +61,18 @@ model User {
   // Связь с задачами (как исполнитель)
   assignedTasks Task[] @relation("AssignedTasks")
 
+  // Связь с уведомлениями
+  notifications Notification[]
+
+  // Связь с активностями
+  activities    Activity[]
+
+  // Связь с файлами
+  files         File[]
+
+  // Связь с настройками
+  settings      UserSettings?
+
   @@index([email])
   @@map("users")
 }
@@ -140,6 +152,12 @@ model Project {
   // Связь с задачами
   tasks       Task[]
 
+  // Связь с активностями
+  activities  Activity[]
+
+  // Связь с файлами
+  files       File[]
+
   @@index([customerId])
   @@index([status])
   @@map("projects")
@@ -173,6 +191,12 @@ model Task {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
+  // Связь с активностями
+  activities  Activity[]
+
+  // Связь с файлами
+  files       File[]
+
   @@index([projectId])
   @@index([assigneeId])
   @@index([status])
@@ -204,4 +228,145 @@ model ContactForm {
   @@index([status])
   @@index([createdAt])
   @@map("contact_forms")
+}
+
+// ============================================
+// НОВЫЕ МОДЕЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА
+// ============================================
+
+enum NotificationType {
+  TASK_ASSIGNED       // Назначена новая задача
+  TASK_UPDATED        // Задача обновлена
+  TASK_COMPLETED      // Задача завершена
+  PROJECT_CREATED     // Создан новый проект
+  PROJECT_UPDATED     // Проект обновлен
+  PROJECT_COMPLETED   // Проект завершен
+  DEADLINE_APPROACHING // Приближается дедлайн
+  COMMENT_ADDED       // Добавлен комментарий
+  FILE_UPLOADED       // Загружен файл
+  SYSTEM              // Системное уведомление
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  read      Boolean          @default(false)
+
+  // Получатель
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Связанные объекты (опционально)
+  projectId String?
+  taskId    String?
+
+  // Ссылка для перехода
+  link      String?
+
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum ActivityType {
+  PROJECT_CREATED       // Проект создан
+  PROJECT_UPDATED       // Проект обновлен
+  PROJECT_STATUS_CHANGED // Статус проекта изменен
+  TASK_CREATED          // Задача создана
+  TASK_UPDATED          // Задача обновлена
+  TASK_STATUS_CHANGED   // Статус задачи изменен
+  TASK_ASSIGNED         // Задача назначена
+  FILE_UPLOADED         // Файл загружен
+  COMMENT_ADDED         // Комментарий добавлен
+  USER_JOINED           // Пользователь присоединился
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  type        ActivityType
+  description String       @db.Text
+
+  // Кто совершил действие
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Связанные объекты (опционально)
+  projectId   String?
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  taskId      String?
+  task        Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  // Метаданные изменений (JSON)
+  metadata    Json?
+
+  createdAt   DateTime     @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+enum FileType {
+  AVATAR      // Аватар пользователя
+  DOCUMENT    // Документ
+  IMAGE       // Изображение
+  ARCHIVE     // Архив
+  OTHER       // Другое
+}
+
+model File {
+  id          String   @id @default(uuid())
+  name        String   // Оригинальное имя файла
+  type        FileType
+  mimeType    String   // MIME тип
+  size        Int      // Размер в байтах
+  url         String   // URL в S3
+  key         String   // Ключ в S3
+
+  // Владелец файла
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Связанные объекты (опционально)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  taskId      String?
+  task        Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([type])
+  @@map("files")
+}
+
+model UserSettings {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Настройки уведомлений
+  emailNotifications    Boolean @default(true)
+  taskNotifications     Boolean @default(true)
+  projectNotifications  Boolean @default(true)
+  deadlineNotifications Boolean @default(true)
+
+  // Настройки интерфейса
+  theme                 String  @default("dark") // dark, light
+  language              String  @default("ru")   // ru, en
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_settings")
 }

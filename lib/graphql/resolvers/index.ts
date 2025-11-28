@@ -5,6 +5,10 @@ import { projectResolvers } from './projectResolvers';
 import { taskResolvers } from './taskResolvers';
 import { reportResolvers } from './reportResolvers';
 import { contactResolvers } from './contactResolvers';
+import { notificationResolvers } from './notificationResolvers';
+import { activityResolvers } from './activityResolvers';
+import { fileResolvers } from './fileResolvers';
+import { settingsResolvers } from './settingsResolvers';
 
 export const resolvers = {
   Query: {
@@ -14,6 +18,10 @@ export const resolvers = {
     ...taskResolvers.Query,
     ...reportResolvers.Query,
     ...contactResolvers.Query,
+    ...notificationResolvers.Query,
+    ...activityResolvers.Query,
+    ...fileResolvers.Query,
+    ...settingsResolvers.Query,
   },
   Mutation: {
     ...authResolvers.Mutation,
@@ -22,7 +30,11 @@ export const resolvers = {
     ...taskResolvers.Mutation,
     ...reportResolvers.Mutation,
     ...contactResolvers.Mutation,
+    ...notificationResolvers.Mutation,
+    ...fileResolvers.Mutation,
+    ...settingsResolvers.Mutation,
   },
   Project: projectResolvers.Project,
   Task: taskResolvers.Task,
+  Activity: activityResolvers.Activity,
 };

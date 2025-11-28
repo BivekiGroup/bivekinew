@@ -1,6 +1,7 @@
 'use client';
 
 import { Sidebar } from './Sidebar';
+import { NotificationCenter } from './NotificationCenter';
 import { useState } from 'react';
 
 interface AppLayoutProps {
@@ -45,6 +46,13 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto w-full lg:w-auto">
+        {/* Header with Notifications */}
+        <div className="sticky top-0 z-30 bg-[#0f1419]/80 backdrop-blur-sm border-b border-white/5">
+          <div className="flex items-center justify-end px-6 py-4">
+            <NotificationCenter />
+          </div>
+        </div>
+
         {children}
       </main>
     </div>

@@ -43,6 +43,40 @@ export const typeDefs = gql`
     REJECTED
   }
 
+  enum NotificationType {
+    TASK_ASSIGNED
+    TASK_UPDATED
+    TASK_COMPLETED
+    PROJECT_CREATED
+    PROJECT_UPDATED
+    PROJECT_COMPLETED
+    DEADLINE_APPROACHING
+    COMMENT_ADDED
+    FILE_UPLOADED
+    SYSTEM
+  }
+
+  enum ActivityType {
+    PROJECT_CREATED
+    PROJECT_UPDATED
+    PROJECT_STATUS_CHANGED
+    TASK_CREATED
+    TASK_UPDATED
+    TASK_STATUS_CHANGED
+    TASK_ASSIGNED
+    FILE_UPLOADED
+    COMMENT_ADDED
+    USER_JOINED
+  }
+
+  enum FileType {
+    AVATAR
+    DOCUMENT
+    IMAGE
+    ARCHIVE
+    OTHER
+  }
+
   type User {
     id: ID!
     email: String!
@@ -269,6 +303,78 @@ export const typeDefs = gql`
     message: String!
   }
 
+  type Notification {
+    id: ID!
+    type: NotificationType!
+    title: String!
+    message: String!
+    read: Boolean!
+    userId: ID!
+    user: User!
+    projectId: ID
+    taskId: ID
+    link: String
+    createdAt: String!
+  }
+
+  type Activity {
+    id: ID!
+    type: ActivityType!
+    description: String!
+    userId: ID!
+    user: User!
+    projectId: ID
+    project: Project
+    taskId: ID
+    task: Task
+    metadata: String
+    createdAt: String!
+  }
+
+  type File {
+    id: ID!
+    name: String!
+    type: FileType!
+    mimeType: String!
+    size: Int!
+    url: String!
+    key: String!
+    userId: ID!
+    user: User!
+    projectId: ID
+    project: Project
+    taskId: ID
+    task: Task
+    createdAt: String!
+  }
+
+  type UserSettings {
+    id: ID!
+    userId: ID!
+    emailNotifications: Boolean!
+    taskNotifications: Boolean!
+    projectNotifications: Boolean!
+    deadlineNotifications: Boolean!
+    theme: String!
+    language: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type NotificationStats {
+    total: Int!
+    unread: Int!
+  }
+
+  input UpdateUserSettingsInput {
+    emailNotifications: Boolean
+    taskNotifications: Boolean
+    projectNotifications: Boolean
+    deadlineNotifications: Boolean
+    theme: String
+    language: String
+  }
+
   type Query {
     me: User
     users: [User!]!
@@ -295,6 +401,22 @@ export const typeDefs = gql`
     # Contact forms
     contactForms: [ContactForm!]!
     contactForm(id: ID!): ContactForm
+
+    # Notifications
+    notifications(limit: Int, offset: Int): [Notification!]!
+    notificationStats: NotificationStats!
+    unreadNotifications: [Notification!]!
+
+    # Activities
+    activities(projectId: ID, limit: Int, offset: Int): [Activity!]!
+    myActivities(limit: Int, offset: Int): [Activity!]!
+
+    # Files
+    files(projectId: ID, taskId: ID): [File!]!
+    file(id: ID!): File
+
+    # User Settings
+    mySettings: UserSettings
   }
 
   type Mutation {
@@ -338,5 +460,16 @@ export const typeDefs = gql`
     # Contact form mutations
     submitContactForm(input: SubmitContactFormInput!): SubmitContactFormResponse!
     updateContactFormStatus(id: ID!, status: ContactStatus!): ContactForm!
+
+    # Notification mutations
+    markNotificationAsRead(id: ID!): Notification!
+    markAllNotificationsAsRead: Boolean!
+    deleteNotification(id: ID!): Boolean!
+
+    # File mutations
+    deleteFile(id: ID!): Boolean!
+
+    # User Settings mutations
+    updateMySettings(input: UpdateUserSettingsInput!): UserSettings!
   }
 `;
