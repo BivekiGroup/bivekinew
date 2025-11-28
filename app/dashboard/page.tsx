@@ -4,6 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useAuth } from '../providers/AuthProvider';
+import { ActivityFeed } from '../components/dashboard/ActivityFeed';
 
 const GET_STATS = gql`
   query GetStats {
@@ -373,6 +374,11 @@ function DashboardContent() {
           )}
         </>
       )}
+
+      {/* Activity Feed - показывается для всех ролей */}
+      <div className="mt-8">
+        <ActivityFeed limit={15} />
+      </div>
     </div>
   );
 }

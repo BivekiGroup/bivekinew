@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { AppLayout } from '../components/layout/AppLayout';
+import { EditProfileModalExtended } from './components/EditProfileModalExtended';
 
 const GET_ME = gql`
   query GetMe {
@@ -164,11 +166,10 @@ function ProfileContent() {
         )}
 
         {/* Edit Profile Modal */}
-        <EditProfileModal
+        <EditProfileModalExtended
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          currentPhone={user?.phone}
-          currentAvatar={user?.avatar}
+          currentUser={user}
           onSuccess={() => refetch()}
         />
     </div>
